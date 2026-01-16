@@ -118,6 +118,7 @@ contextBridge.exposeInMainWorld("desktopApi", {
   logout: () => ipcRenderer.invoke("auth:logout"),
   startAuthFlow: () => ipcRenderer.invoke("auth:start-flow"),
   submitAuthCode: (code: string) => ipcRenderer.invoke("auth:submit-code", code),
+  updateUser: (updates: { name?: string }) => ipcRenderer.invoke("auth:update-user", updates),
 
   // Auth events
   onAuthSuccess: (callback: (user: any) => void) => {
@@ -201,6 +202,13 @@ export interface DesktopApi {
   logout: () => Promise<void>
   startAuthFlow: () => Promise<void>
   submitAuthCode: (code: string) => Promise<void>
+  updateUser: (updates: { name?: string }) => Promise<{
+    id: string
+    email: string
+    name: string | null
+    imageUrl: string | null
+    username: string | null
+  } | null>
   onAuthSuccess: (callback: (user: any) => void) => () => void
   onAuthError: (callback: (error: string) => void) => () => void
   // Shortcuts

@@ -242,7 +242,7 @@ export function SubChatSelector({
         // Revert on error (like Canvas)
         useAgentSubChatStore
           .getState()
-          .updateSubChatName(subChat.id, oldName || "New Agent")
+          .updateSubChatName(subChat.id, oldName || "New Chat")
       } finally {
         setEditLoading(false)
       }
@@ -587,7 +587,7 @@ export function SubChatSelector({
                             }}
                             className="relative z-0 text-left flex-1 min-w-0 pr-1 overflow-hidden block whitespace-nowrap"
                           >
-                            {subChat.name || "New Agent"}
+                            {subChat.name || "New Chat"}
                           </span>
                         )}
 
@@ -701,7 +701,7 @@ export function SubChatSelector({
             placeholder="Search chats..."
             emptyMessage="No results"
             getItemValue={(subChat) =>
-              `${subChat.name || "New Agent"} ${subChat.id}`
+              `${subChat.name || "New Chat"} ${subChat.id}`
             }
             renderItem={(subChat) => {
               const timeAgo = formatTimeAgo(
@@ -732,7 +732,7 @@ export function SubChatSelector({
                     )}
                   </div>
                   <span className="text-sm truncate flex-1">
-                    {subChat.name || "New Agent"}
+                    {subChat.name || "New Chat"}
                   </span>
                   <span className="text-sm text-muted-foreground whitespace-nowrap">
                     {timeAgo}

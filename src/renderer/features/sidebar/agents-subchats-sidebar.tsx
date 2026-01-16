@@ -452,7 +452,7 @@ export function AgentsSubChatsSidebar({
         // Rollback on error
         useAgentSubChatStore
           .getState()
-          .updateSubChatName(subChatId, oldName || "New Agent")
+          .updateSubChatName(subChatId, oldName || "New Chat")
       } finally {
         setRenameLoading(false)
         setRenamingSubChat(null)
@@ -469,7 +469,7 @@ export function AgentsSubChatsSidebar({
     // Create sub-chat in DB first to get the real ID
     const newSubChat = await trpcClient.chats.createSubChat.mutate({
       chatId: parentChatId,
-      name: "New Agent",
+      name: "New Chat",
       mode: "agent",
     })
     const newId = newSubChat.id
@@ -480,7 +480,7 @@ export function AgentsSubChatsSidebar({
     // Add to allSubChats with placeholder name
     store.addToAllSubChats({
       id: newId,
-      name: "New Agent",
+      name: "New Chat",
       created_at: new Date().toISOString(),
       mode: "agent",
     })
@@ -762,7 +762,7 @@ export function AgentsSubChatsSidebar({
         placeholder="Search chats..."
         emptyMessage="No results"
         getItemValue={(subChat) =>
-          `${subChat.name || "New Agent"} ${subChat.id}`
+          `${subChat.name || "New Chat"} ${subChat.id}`
         }
         renderItem={(subChat) => {
           const timeAgo = formatTimeAgo(
@@ -793,7 +793,7 @@ export function AgentsSubChatsSidebar({
                 )}
               </div>
               <span className="text-sm truncate flex-1">
-                {subChat.name || "New Agent"}
+                {subChat.name || "New Chat"}
               </span>
               <span className="text-sm text-muted-foreground whitespace-nowrap">
                 {timeAgo}
@@ -1028,7 +1028,7 @@ export function AgentsSubChatsSidebar({
                         )}
                       >
                         <h3 className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-                          Pinned
+                          Pinned Chats
                         </h3>
                       </div>
                       <div className="list-none p-0 m-0 mb-3">
@@ -1092,7 +1092,7 @@ export function AgentsSubChatsSidebar({
                                     setHoveredChatIndex(globalIndex)
                                     handleSubChatMouseEnter(
                                       subChat.id,
-                                      subChat.name || "New Agent",
+                                      subChat.name || "New Chat",
                                       e.currentTarget,
                                     )
                                   }}
@@ -1185,7 +1185,7 @@ export function AgentsSubChatsSidebar({
                                         >
                                           <TypewriterText
                                             text={subChat.name || ""}
-                                            placeholder="New Agent"
+                                            placeholder="New Chat"
                                             id={subChat.id}
                                             isJustCreated={justCreatedIds.has(subChat.id)}
                                             showPlaceholder={true}
@@ -1301,7 +1301,7 @@ export function AgentsSubChatsSidebar({
                         )}
                       >
                         <h3 className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-                          {pinnedChats.length > 0 ? "Recent" : "Chats"}
+                          {pinnedChats.length > 0 ? "Recent chats" : "Chats"}
                         </h3>
                       </div>
                       <div className="list-none p-0 m-0">
@@ -1365,7 +1365,7 @@ export function AgentsSubChatsSidebar({
                                     setHoveredChatIndex(globalIndex)
                                     handleSubChatMouseEnter(
                                       subChat.id,
-                                      subChat.name || "New Agent",
+                                      subChat.name || "New Chat",
                                       e.currentTarget,
                                     )
                                   }}
@@ -1458,7 +1458,7 @@ export function AgentsSubChatsSidebar({
                                         >
                                           <TypewriterText
                                             text={subChat.name || ""}
-                                            placeholder="New Agent"
+                                            placeholder="New Chat"
                                             id={subChat.id}
                                             isJustCreated={justCreatedIds.has(subChat.id)}
                                             showPlaceholder={true}

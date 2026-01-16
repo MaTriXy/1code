@@ -40,15 +40,11 @@ function CircularProgress({
   size = 18,
   strokeWidth = 2,
   className,
-  isCritical,
-  isNearingLimit,
 }: {
   percent: number
   size?: number
   strokeWidth?: number
   className?: string
-  isCritical?: boolean
-  isNearingLimit?: boolean
 }) {
   const radius = (size - strokeWidth) / 2
   const circumference = 2 * Math.PI * radius
@@ -81,14 +77,7 @@ function CircularProgress({
         strokeDasharray={circumference}
         strokeDashoffset={offset}
         strokeLinecap="round"
-        className={cn(
-          "transition-all duration-300",
-          isCritical
-            ? "text-rose-500"
-            : isNearingLimit
-              ? "text-amber-500"
-              : "text-muted-foreground/60",
-        )}
+        className="transition-all duration-300 text-muted-foreground/60"
       />
     </svg>
   )
@@ -129,9 +118,6 @@ export const AgentContextIndicator = memo(function AgentContextIndicator({
     (sessionTotals.totalTokens / contextWindow) * 100,
   )
 
-  // Determine warning levels
-  const isNearingLimit = percentUsed >= 75
-  const isCritical = percentUsed >= 90
   const isEmpty = sessionTotals.totalTokens === 0
 
   return (
@@ -143,13 +129,7 @@ export const AgentContextIndicator = memo(function AgentContextIndicator({
             className,
           )}
         >
-          <CircularProgress
-            percent={percentUsed}
-            size={14}
-            strokeWidth={2.5}
-            isCritical={isCritical}
-            isNearingLimit={isNearingLimit}
-          />
+          <CircularProgress percent={percentUsed} size={14} strokeWidth={2.5} />
         </div>
       </TooltipTrigger>
       <TooltipContent side="top" sideOffset={8}>

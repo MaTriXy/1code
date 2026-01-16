@@ -485,6 +485,7 @@ export function AgentsContent() {
 
   // Get open sub-chats for quick-switch (only tabs that are open in the selector)
   // Sorted by position in openSubChatIds, with active first
+  // Limited to 5 items for quick-switch dialog
   const recentSubChats = useMemo(() => {
     if (!openSubChatIds || openSubChatIds.length === 0) return []
 
@@ -495,13 +496,13 @@ export function AgentsContent() {
 
     if (openSubChats.length === 0) return []
 
-    // Put active sub-chat first, keep rest in tab order
+    // Put active sub-chat first, keep rest in tab order, limit to 5
     if (activeSubChatId) {
       const activeChat = openSubChats.find((c) => c.id === activeSubChatId)
-      const otherChats = openSubChats.filter((c) => c.id !== activeSubChatId)
-      return activeChat ? [activeChat, ...otherChats] : openSubChats
+      const otherChats = openSubChats.filter((c) => c.id !== activeSubChatId).slice(0, 4)
+      return activeChat ? [activeChat, ...otherChats] : openSubChats.slice(0, 5)
     }
-    return openSubChats
+    return openSubChats.slice(0, 5)
   }, [openSubChatIds, allSubChats, activeSubChatId])
 
   // Keyboard navigation: Quick switch between agents (sub-chats within workspace)
@@ -564,19 +565,19 @@ export function AgentsContent() {
 
           if (openSubChats.length === 0) return
 
-          // Put active sub-chat first
+          // Put active sub-chat first, limit to 5
           if (currentActiveId) {
             const activeChat = openSubChats.find(
               (c) => c.id === currentActiveId,
             )
             const otherChats = openSubChats.filter(
               (c) => c.id !== currentActiveId,
-            )
+            ).slice(0, 4)
             frozenSubChatsRef.current = activeChat
               ? [activeChat, ...otherChats]
-              : openSubChats
+              : openSubChats.slice(0, 5)
           } else {
-            frozenSubChatsRef.current = openSubChats
+            frozenSubChatsRef.current = openSubChats.slice(0, 5)
           }
 
           subChatHoldTimerRef.current = setTimeout(() => {

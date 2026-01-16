@@ -1,11 +1,8 @@
 import { AuthStore, AuthData, AuthUser } from "./auth-store"
 import { app, BrowserWindow } from "electron"
 
-// API URLs
-const API_URLS = {
-  production: "https://21st.dev",
-  development: "http://localhost:3000",
-} as const
+// Auth API URL - use env variable for local testing, default to production
+const AUTH_API_URL = import.meta.env.MAIN_VITE_API_URL || "https://21st.dev"
 
 export class AuthManager {
   private store: AuthStore
@@ -32,7 +29,7 @@ export class AuthManager {
   }
 
   private getApiUrl(): string {
-    return this.isDev ? API_URLS.development : API_URLS.production
+    return AUTH_API_URL
   }
 
   /**
@@ -217,5 +214,35 @@ export class AuthManager {
     }
 
     shell.openExternal(authUrl)
+  }
+
+  /**
+   * Update user profile on server and locally
+   */
+  async updateUser(updates: { name?: string }): Promise<AuthUser | null> {
+    const token = await this.getValidToken()
+    if (!token) {
+      throw new Error("Not authenticated")
+    }
+
+    // Update on server using X-Desktop-Token header
+    const response = await fetch(`${this.getApiUrl()}/api/user/profile`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Desktop-Token": token,
+      },
+      body: JSON.stringify({
+        display_name: updates.name,
+      }),
+    })
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: "Unknown error" }))
+      throw new Error(error.error || `Update failed: ${response.status}`)
+    }
+
+    // Update locally
+    return this.store.updateUser({ name: updates.name ?? null })
   }
 }

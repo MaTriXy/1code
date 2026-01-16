@@ -353,17 +353,69 @@ export function AgentsSidebar({
     prevArchivePopoverOpen.current = archivePopoverOpen
   }, [archivePopoverOpen])
 
+  // Stack of archived chats for multiple Cmd+Z undos
+  const archivedStackRef = useRef<Array<{
+    chatId: string
+    timeoutId: ReturnType<typeof setTimeout>
+  }>>([])
+
+  // Restore chat mutation (for undo)
+  const restoreChatMutation = trpc.chats.restore.useMutation({
+    onSuccess: () => {
+      utils.chats.list.invalidate()
+      utils.chats.listArchived.invalidate()
+    },
+  })
+
+  // Remove item from stack by chatId
+  const removeFromStack = useCallback((chatId: string) => {
+    const index = archivedStackRef.current.findIndex((item) => item.chatId === chatId)
+    if (index !== -1) {
+      clearTimeout(archivedStackRef.current[index].timeoutId)
+      archivedStackRef.current.splice(index, 1)
+    }
+  }, [])
+
   // Archive chat mutation
   const archiveChatMutation = trpc.chats.archive.useMutation({
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       utils.chats.list.invalidate()
       utils.chats.listArchived.invalidate()
       // If archiving the currently selected chat, clear selection
       if (selectedChatId) {
         setSelectedChatId(null)
       }
+
+      // Clear after 10 seconds (Cmd+Z window)
+      const timeoutId = setTimeout(() => {
+        removeFromStack(variables.id)
+      }, 10000)
+
+      // Add to stack for Cmd+Z
+      archivedStackRef.current.push({
+        chatId: variables.id,
+        timeoutId,
+      })
     },
   })
+
+  // Cmd+Z to undo archive (supports multiple undos)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "z" && archivedStackRef.current.length > 0) {
+        e.preventDefault()
+        // Pop the most recent archived item
+        const item = archivedStackRef.current.pop()
+        if (item) {
+          clearTimeout(item.timeoutId)
+          restoreChatMutation.mutate({ id: item.chatId })
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [restoreChatMutation])
 
   // Batch archive mutation
   const archiveChatsBatchMutation = trpc.chats.archiveBatch.useMutation({
@@ -1427,7 +1479,7 @@ export function AgentsSidebar({
                     )}
                   >
                     <h3 className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-                      Pinned
+                      Pinned Workspaces
                     </h3>
                   </div>
                   <div className="list-none p-0 m-0 mb-3">
@@ -1650,7 +1702,8 @@ export function AgentsSidebar({
                                     onClick={() => {
                                       navigator.clipboard.writeText(branch)
                                       toast.success(
-                                        "Branch name copied to clipboard",
+                                        "Branch name copied",
+                                        { description: branch },
                                       )
                                     }}
                                   >
@@ -1706,7 +1759,7 @@ export function AgentsSidebar({
                     )}
                   >
                     <h3 className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-                      {pinnedAgents.length > 0 ? "Recent" : "Workspaces"}
+                      {pinnedAgents.length > 0 ? "Recent workspaces" : "Workspaces"}
                     </h3>
                   </div>
                   <div className="list-none p-0 m-0">
@@ -1932,7 +1985,8 @@ export function AgentsSidebar({
                                     onClick={() => {
                                       navigator.clipboard.writeText(branch)
                                       toast.success(
-                                        "Branch name copied to clipboard",
+                                        "Branch name copied",
+                                        { description: branch },
                                       )
                                     }}
                                   >

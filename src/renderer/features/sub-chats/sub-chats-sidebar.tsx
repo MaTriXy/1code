@@ -354,7 +354,7 @@ export function SubChatsSidebar({
     // Add to allSubChats with placeholder name
     store.addToAllSubChats({
       id: newId,
-      name: "New Agent",
+      name: "New Chat",
       created_at: new Date().toISOString(),
       mode: "agent",
     })
@@ -520,7 +520,7 @@ export function SubChatsSidebar({
         placeholder="Search chats..."
         emptyMessage="No results"
         getItemValue={(subChat) =>
-          `${subChat.name || "New Agent"} ${subChat.id}`
+          `${subChat.name || "New Chat"} ${subChat.id}`
         }
         renderItem={(subChat) => {
           const timeAgo = formatTimeAgo(
@@ -529,7 +529,7 @@ export function SubChatsSidebar({
           return (
             <div className="flex items-center gap-2 flex-1 min-w-0">
               <span className="text-sm truncate">
-                {subChat.name || "New Agent"}
+                {subChat.name || "New Chat"}
               </span>
               <span className="text-sm text-muted-foreground whitespace-nowrap">
                 {timeAgo}
@@ -616,7 +616,7 @@ export function SubChatsSidebar({
               setHoveredChatIndex(globalIndex)
               handleSubChatMouseEnter(
                 subChat.id,
-                subChat.name || "New Agent",
+                subChat.name || "New Chat",
                 e.currentTarget,
               )
             }}
@@ -684,7 +684,7 @@ export function SubChatsSidebar({
                     }}
                     className="truncate block text-sm leading-tight flex-1"
                   >
-                    {subChat.name || "New Agent"}
+                    {subChat.name || "New Chat"}
                   </span>
                   {!isMultiSelectMode && (
                     <button

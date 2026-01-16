@@ -79,6 +79,7 @@ import { agentsSidebarOpenAtom, agentsUnseenChangesAtom } from "../atoms"
 import { AgentSendButton } from "../components/agent-send-button"
 import { CreateBranchDialog } from "../components/create-branch-dialog"
 import { formatTimeAgo } from "../utils/format-time-ago"
+import { handlePasteEvent } from "../utils/paste-text"
 import {
   loadGlobalDrafts,
   saveGlobalDrafts,
@@ -442,7 +443,7 @@ export function NewChatForm({
     setSelectedBranch,
   ])
 
-  // Auto-focus input when NewChatForm is shown (when clicking "New Agent")
+  // Auto-focus input when NewChatForm is shown (when clicking "New Chat")
   // Skip on mobile to prevent keyboard from opening automatically
   useEffect(() => {
     if (isMobileFullscreen) return // Don't autofocus on mobile
@@ -801,25 +802,9 @@ export function NewChatForm({
   )
 
   // Paste handler for images and plain text
+  // Uses async text insertion to prevent UI freeze with large text
   const handlePaste = useCallback(
-    (e: React.ClipboardEvent) => {
-      const files = Array.from(e.clipboardData.items)
-        .filter((item) => item.type.startsWith("image/"))
-        .map((item) => item.getAsFile())
-        .filter(Boolean) as File[]
-
-      if (files.length > 0) {
-        e.preventDefault()
-        handleAddAttachments(files)
-      } else {
-        // Paste as plain text only (prevents HTML from being pasted)
-        const text = e.clipboardData.getData("text/plain")
-        if (text) {
-          e.preventDefault()
-          document.execCommand("insertText", false, text)
-        }
-      }
-    },
+    (e: React.ClipboardEvent) => handlePasteEvent(e, handleAddAttachments),
     [handleAddAttachments],
   )
 
